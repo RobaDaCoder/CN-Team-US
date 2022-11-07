@@ -49,7 +49,6 @@ public class client extends javax.swing.JFrame {
         AppRunning = new javax.swing.JButton();
         ShutDown = new javax.swing.JButton();
         Screenshot = new javax.swing.JButton();
-        FixRegistry = new javax.swing.JButton();
         Exit = new javax.swing.JButton();
         ProcessRunning = new javax.swing.JButton();
         checkscreen = new javax.swing.JButton();
@@ -98,13 +97,6 @@ public class client extends javax.swing.JFrame {
             }
         });
 
-        FixRegistry.setText("Fix Registry");
-        FixRegistry.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                FixRegistryActionPerformed(evt);
-            }
-        });
-
         Exit.setText("Exit");
         Exit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -134,25 +126,23 @@ public class client extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(iptext, javax.swing.GroupLayout.PREFERRED_SIZE, 295, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(iptext, javax.swing.GroupLayout.PREFERRED_SIZE, 424, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(ipconnect))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(ProcessRunning, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(FixRegistry, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(ShutDown)
-                                .addGap(9, 9, 9)
-                                .addComponent(Screenshot)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(checkscreen))
-                            .addComponent(AppRunning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(Exit, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(KeyStroke, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(Screenshot, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(checkscreen, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(AppRunning, javax.swing.GroupLayout.DEFAULT_SIZE, 293, Short.MAX_VALUE)
+                            .addComponent(ShutDown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(KeyStroke, javax.swing.GroupLayout.DEFAULT_SIZE, 92, Short.MAX_VALUE)
+                            .addComponent(Exit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(51, 51, 51)))
                 .addContainerGap())
         );
@@ -171,14 +161,13 @@ public class client extends javax.swing.JFrame {
                                 .addComponent(AppRunning, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(ShutDown, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(Screenshot, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(checkscreen, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
                             .addComponent(KeyStroke, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(Exit, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(FixRegistry, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(ShutDown, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(ProcessRunning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
@@ -242,7 +231,6 @@ public class client extends javax.swing.JFrame {
         }
         String s = "EXIT";
         try {
-//            program.os = new BufferedWriter(new OutputStreamWriter(program.sclient.getOutputStream()));
             program.os.write(s);
             program.os.newLine();
             program.os.flush();
@@ -260,7 +248,6 @@ public class client extends javax.swing.JFrame {
         }
         String s = "TAKEPIC";
         try {
-//            program.os = new BufferedWriter(new OutputStreamWriter(program.sclient.getOutputStream()));
             program.os.write(s);
             program.os.newLine();
             program.os.flush();
@@ -324,25 +311,6 @@ public class client extends javax.swing.JFrame {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_KeyStrokeActionPerformed
-
-    private void FixRegistryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FixRegistryActionPerformed
-        if(program.sclient == null)
-        {
-            JOptionPane.showMessageDialog(rootPane, "Chưa kết nối tới server");
-            return;
-        }
-        registry registry = new registry();
-        registry.show();
-        String s = "REGISTRY";
-        try {
-//            program.os = new BufferedWriter(new OutputStreamWriter(program.sclient.getOutputStream()));
-            program.os.write(s);
-            program.os.newLine();
-            program.os.flush();
-        } catch (IOException ex) {
-            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_FixRegistryActionPerformed
 
     private void checkscreenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkscreenActionPerformed
         if(program.sclient == null)
@@ -412,7 +380,6 @@ public class client extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton AppRunning;
     private javax.swing.JButton Exit;
-    private javax.swing.JButton FixRegistry;
     private javax.swing.JButton KeyStroke;
     private javax.swing.JButton ProcessRunning;
     private javax.swing.JButton Screenshot;

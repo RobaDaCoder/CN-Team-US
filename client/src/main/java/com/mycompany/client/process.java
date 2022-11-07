@@ -66,6 +66,11 @@ public class process extends javax.swing.JFrame {
         });
 
         Xoa.setText("Xóa");
+        Xoa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                XoaActionPerformed(evt);
+            }
+        });
 
         Start.setText("Start");
         Start.addActionListener(new java.awt.event.ActionListener() {
@@ -128,9 +133,14 @@ public class process extends javax.swing.JFrame {
             program.os.newLine();
             program.os.flush();
             String soprocess = program.is.readLine();
+            DefaultTableModel dm = (DefaultTableModel)jTable1.getModel();
+            while(dm.getRowCount() > 0)
+            {
+                dm.removeRow(0);
+            }
             int soprocess1 = 0;
             soprocess1 = Integer.parseInt(soprocess);
-            ObjectInputStream oin = new ObjectInputStream(program.sclient.getInputStream());
+            oin = new ObjectInputStream(program.sclient.getInputStream());
             for (int i = 0; i < soprocess1-3; i++)
             {
                 String[] data = (String[]) oin.readObject();
@@ -145,7 +155,15 @@ public class process extends javax.swing.JFrame {
     }//GEN-LAST:event_XemActionPerformed
 
     private void StartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartActionPerformed
-        // TODO add your handling code here:
+        String s = "START";
+        try {
+            program.os.write(s);
+            program.os.newLine();
+            program.os.flush();
+            new start1().setVisible(true);
+        } catch (IOException ex) {
+            Logger.getLogger(listApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_StartActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -159,6 +177,14 @@ public class process extends javax.swing.JFrame {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_formWindowClosing
+
+    private void XoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_XoaActionPerformed
+        DefaultTableModel dm = (DefaultTableModel)jTable1.getModel();
+            while(dm.getRowCount() > 0)
+            {
+                dm.removeRow(0);
+            }
+    }//GEN-LAST:event_XoaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -194,7 +220,7 @@ public class process extends javax.swing.JFrame {
 //            }
 //        });
 //    }
-
+    ObjectInputStream oin = null;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Kill;
     private javax.swing.JButton Start;

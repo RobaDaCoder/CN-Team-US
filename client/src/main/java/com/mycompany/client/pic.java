@@ -8,10 +8,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
@@ -30,20 +36,21 @@ import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.WindowConstants;
 import javax.swing.filechooser.FileNameExtensionFilter;
 /**
  *
  * @author LEGION
  */
 public class pic extends javax.swing.JFrame {
-
+    static BufferedImage image;
     /**
      * Creates new form pic
      */
     public pic() {
         initComponents();
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
     }
 
     /**
@@ -60,6 +67,11 @@ public class pic extends javax.swing.JFrame {
         savepic = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
+            }
+        });
 
         screenshot.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -109,13 +121,12 @@ public class pic extends javax.swing.JFrame {
     private void takepicActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_takepicActionPerformed
         String s = "TAKE";
         try {
-            program.os.write(s);
-            program.os.newLine();
-            program.os.flush();
-            img = ImageIO.read(ImageIO.createImageInputStream(program.sclient.getInputStream()));
-            screenshot.getGraphics().drawImage(img,0,0,screenshot.getWidth(),screenshot.getHeight(),null);
-            program.img1 = img;
-            
+                program.os.write(s);
+                program.os.newLine();
+                program.os.flush();  
+                img = ImageIO.read(ImageIO.createImageInputStream(program.sclient.getInputStream()));
+                Image img1 = img;
+                screenshot.setIcon(new ImageIcon(img1.getScaledInstance(screenshot.getWidth(),screenshot.getHeight(), Image.SCALE_DEFAULT)));
         } catch (IOException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -138,6 +149,17 @@ public class pic extends javax.swing.JFrame {
             System.out.println("No file choosen!");
         }
     }//GEN-LAST:event_savepicActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        try {
+            String s = "QUIT";
+            program.os.write(s);
+            program.os.newLine();
+            program.os.flush();
+        } catch (IOException ex) {
+            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_formWindowClosing
 
     /**
      * @param args the command line arguments

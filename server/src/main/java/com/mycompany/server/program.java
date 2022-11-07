@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Other/File.java to edit this template
  */
 package com.mycompany.server;
+import java.awt.AWTException;
 import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -17,6 +18,8 @@ import java.awt.Robot;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -59,28 +62,6 @@ public class program {
                 
             }
         });
-//            try {
-//            String line;
-//            Process p = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
-//            BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//            int i;
-//            for(i = 0; (line = input.readLine()) != null;i++) {
-//                line = input.readLine();
-//                input.readLine();
-//                if (i>2)
-//                {
-//                    System.out.println(line);
-//                }
-//            }
-////            line = "lsass.exe                     1128 Services                   0     26,220 K";
-////            String[] splitline = StringUtils.split(line);
-////            for (i = 0; i < splitline.length;i++)
-////            {
-////                System.out.println(splitline[i]);
-////            }
-//            input.close();
-//            } catch (Exception err) {
-//            err.printStackTrace();
-//            }
+                
         }
 }

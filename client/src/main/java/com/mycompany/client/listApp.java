@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -57,6 +58,11 @@ public class listApp extends javax.swing.JFrame {
         });
 
         Kill.setText("Kill");
+        Kill.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                KillActionPerformed(evt);
+            }
+        });
 
         Xem.setText("Xem");
         Xem.addActionListener(new java.awt.event.ActionListener() {
@@ -66,6 +72,11 @@ public class listApp extends javax.swing.JFrame {
         });
 
         Xoa.setText("Xóa");
+        Xoa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                XoaActionPerformed(evt);
+            }
+        });
 
         Start.setText("Start");
         Start.addActionListener(new java.awt.event.ActionListener() {
@@ -129,9 +140,14 @@ public class listApp extends javax.swing.JFrame {
             program.os.flush();
             String soprocess = program.is.readLine();
             int soprocess1 = 0;
+            DefaultTableModel dm = (DefaultTableModel)jTable1.getModel();
+            while(dm.getRowCount() > 0)
+            {
+                dm.removeRow(0);
+            }
             soprocess1 = Integer.parseInt(soprocess);
-            ObjectInputStream oin = new ObjectInputStream(program.sclient.getInputStream());
-            for (int i = 0; i < soprocess1-4; i++)
+            oin = new ObjectInputStream(program.sclient.getInputStream());
+            for (int i = 0; i < soprocess1-5; i++)
             {
                 String[] data = (String[]) oin.readObject();
                 DefaultTableModel table = (DefaultTableModel)jTable1.getModel();
@@ -145,7 +161,15 @@ public class listApp extends javax.swing.JFrame {
     }//GEN-LAST:event_XemActionPerformed
 
     private void StartActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartActionPerformed
-        // TODO add your handling code here:
+        String s = "START";
+        try {
+            program.os.write(s);
+            program.os.newLine();
+            program.os.flush();
+            new start1().setVisible(true);
+        } catch (IOException ex) {
+            Logger.getLogger(listApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_StartActionPerformed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -159,6 +183,18 @@ public class listApp extends javax.swing.JFrame {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_formWindowClosing
+
+    private void XoaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_XoaActionPerformed
+        DefaultTableModel dm = (DefaultTableModel)jTable1.getModel();
+            while(dm.getRowCount() > 0)
+            {
+                dm.removeRow(0);
+            }
+    }//GEN-LAST:event_XoaActionPerformed
+
+    private void KillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KillActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_KillActionPerformed
 
     /**
      * @param args the command line arguments
@@ -194,7 +230,7 @@ public class listApp extends javax.swing.JFrame {
 //            }
 //        });
 //    }
-
+    ObjectInputStream oin = null;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Kill;
     private javax.swing.JButton Start;
