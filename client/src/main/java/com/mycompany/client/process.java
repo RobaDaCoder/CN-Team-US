@@ -57,6 +57,11 @@ public class process extends javax.swing.JFrame {
         });
 
         Kill.setText("Kill");
+        Kill.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                KillActionPerformed(evt);
+            }
+        });
 
         Xem.setText("Xem");
         Xem.addActionListener(new java.awt.event.ActionListener() {
@@ -160,7 +165,7 @@ public class process extends javax.swing.JFrame {
             program.os.write(s);
             program.os.newLine();
             program.os.flush();
-            new start1().setVisible(true);
+            new start().setVisible(true);
         } catch (IOException ex) {
             Logger.getLogger(listApp.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -185,6 +190,18 @@ public class process extends javax.swing.JFrame {
                 dm.removeRow(0);
             }
     }//GEN-LAST:event_XoaActionPerformed
+
+    private void KillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_KillActionPerformed
+        String s = "KILL";
+        try {
+            program.os.write(s);
+            program.os.newLine();
+            program.os.flush();
+            new kill().setVisible(true);
+        } catch (IOException ex) {
+            Logger.getLogger(listApp.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_KillActionPerformed
 
     /**
      * @param args the command line arguments

@@ -191,23 +191,23 @@ public class server extends javax.swing.JFrame {
                 {
                     try {
                         String line = null;
-                        Process p = Runtime.getRuntime().exec("powershell.exe Get-Process | Where-Object { $_.MainWindowTitle } | Format-Table ID,Name,Mainwindowtitle –AutoSize");
-                        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));                  
+                        p = Runtime.getRuntime().exec("powershell.exe Get-Process | Where-Object { $_.MainWindowTitle } | Format-Table ID,Name,Mainwindowtitle –AutoSize");
+                        input = new BufferedReader(new InputStreamReader(p.getInputStream()));                  
                         int soprocess = 0;
                         while(input.readLine() != null){
                             soprocess++;
                         }
                         String soprocess1 = Integer.toString(soprocess);
-                        program.os = new BufferedWriter(new OutputStreamWriter(program.sserver.getOutputStream()));
+//                        program.os = new BufferedWriter(new OutputStreamWriter(program.sserver.getOutputStream()));
                         program.os.write(soprocess1);
                         program.os.newLine();
                         program.os.flush();
-                        Process p1 = Runtime.getRuntime().exec("powershell.exe Get-Process | Where-Object { $_.MainWindowTitle } | Format-Table ID,Name,Mainwindowtitle –AutoSize");
-                        BufferedReader input1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
-                        ObjectOutputStream out = new ObjectOutputStream(program.sserver.getOutputStream());
+                        p1 = Runtime.getRuntime().exec("powershell.exe Get-Process | Where-Object { $_.MainWindowTitle } | Format-Table ID,Name,Mainwindowtitle –AutoSize");
+                        input = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+                        out = new ObjectOutputStream(program.sserver.getOutputStream());
                         try {
                             for(int i = 0; (i<soprocess) ;i++) {
-                                line = input1.readLine();
+                                line = input.readLine();
                                 line = line.trim();
                                 if (i>=3) 
                                 {
@@ -240,10 +240,23 @@ public class server extends javax.swing.JFrame {
                         {
                             case "STARTEXE" -> {
                                 String exe = program.is.readLine();
+                                if (exe != "")
+                                {
                                 try {
                                     Process child = Runtime.getRuntime().exec("cmd /c start "+exe+".exe");
+                                    program.os.write("Successfully run the program!");
+                                    program.os.newLine();
+                                    program.os.flush();
                                 } catch (IOException ex) {
-                                    JOptionPane.showMessageDialog(rootPane, "Không thể chạy " + exe +".exe này");
+                                    program.os.write("There is an error, please try again!");
+                                    program.os.newLine();
+                                    program.os.flush();
+                                }
+                                } else {
+                                program.os.write("There is an error, please try again!");
+                                program.os.newLine();
+                                program.os.flush();
+                                break;
                                 }
                             }
                             case "QUIT" -> {
@@ -252,6 +265,42 @@ public class server extends javax.swing.JFrame {
                             }
                         }
                     }
+                }
+                case "KILL" -> {
+                    boolean work = true;
+                    while (work) {
+                        receiveSignal();
+                        switch(program.signal)
+                        {
+                            case "KILLID" -> {
+                                String pid = program.is.readLine();
+                                if (pid != null)
+                                {
+                                try {
+                                    String cmd = "taskkill /F /T /PID " + pid;
+                                    Runtime.getRuntime().exec(cmd);
+                                    program.os.write("Successfully kill a process!");
+                                    program.os.newLine();
+                                    program.os.flush();
+                                } catch (IOException ex) {
+                                    program.os.write("There is an error, please try again!");
+                                    program.os.newLine();
+                                    program.os.flush();
+                                    break;
+                                }
+                                } else {
+                                program.os.write("There is an error, please try again!");
+                                program.os.newLine();
+                                program.os.flush();
+                                break;
+                                }
+                            }
+                            case "QUIT" -> {
+                                work = false;
+                                break;
+                            }
+                        }
+                }
                 }
                       case "QUIT" -> {
                       indo = false;
@@ -272,23 +321,22 @@ public class server extends javax.swing.JFrame {
                 case "XEM" ->                 {
                     try {
                         String line = null;
-                        Process p = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
-                        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));                  
+                        p = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
+                        input = new BufferedReader(new InputStreamReader(p.getInputStream()));                  
                         int soprocess = 0;
                         while(input.readLine() != null){
                             soprocess++;
                         }
                         String soprocess1 = Integer.toString(soprocess);
-                        program.os = new BufferedWriter(new OutputStreamWriter(program.sserver.getOutputStream()));
                         program.os.write(soprocess1);
                         program.os.newLine();
                         program.os.flush();
-                        Process p1 = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
-                        BufferedReader input1 = new BufferedReader(new InputStreamReader(p1.getInputStream()));
-                        ObjectOutputStream out = new ObjectOutputStream(program.sserver.getOutputStream());
+                        p1 = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
+                        input = new BufferedReader(new InputStreamReader(p1.getInputStream()));
+                        out = new ObjectOutputStream(program.sserver.getOutputStream());
                         try {
                             for(int i = 0; (i<soprocess) ;i++) {
-                                line = input1.readLine();
+                                line = input.readLine();
                                 line = line.trim();
                                 if (i>=3)
                                 {
@@ -324,10 +372,24 @@ public class server extends javax.swing.JFrame {
                         {
                             case "STARTEXE" -> {
                                 String exe = program.is.readLine();
+                                if (exe != null)
+                                {
                                 try {
-                                    Process child = Runtime.getRuntime().exec("cmd /c start "+exe+".exe");
+                                    Runtime.getRuntime().exec("cmd /c start "+ exe +".exe");
+                                    program.os.write("Successfully run the program!");
+                                    program.os.newLine();
+                                    program.os.flush();
                                 } catch (IOException ex) {
-                                    JOptionPane.showMessageDialog(rootPane, "Không thể chạy " + exe +".exe này");
+                                    program.os.write("There is an error, please try again!");
+                                    program.os.newLine();
+                                    program.os.flush();
+                                    break;
+                                }
+                                } else {
+                                program.os.write("There is an error, please try again!");
+                                program.os.newLine();
+                                program.os.flush();
+                                break;
                                 }
                             }
                             case "QUIT" -> {
@@ -336,6 +398,42 @@ public class server extends javax.swing.JFrame {
                             }
                         }
                     }
+                }
+                case "KILL" -> {
+                    boolean work = true;
+                    while (work) {
+                        receiveSignal();
+                        switch(program.signal)
+                        {
+                            case "KILLID" -> {
+                                String pid = program.is.readLine();
+                                if (pid != null)
+                                {
+                                try {
+                                    String cmd = "taskkill /F /T /PID " + pid;
+                                    Runtime.getRuntime().exec(cmd);
+                                    program.os.write("Successfully kill a process!");
+                                    program.os.newLine();
+                                    program.os.flush();
+                                } catch (IOException ex) {
+                                    program.os.write("There is an error, please try again!");
+                                    program.os.newLine();
+                                    program.os.flush();
+                                    break;
+                                }
+                                } else {
+                                program.os.write("There is an error, please try again!");
+                                program.os.newLine();
+                                program.os.flush();
+                                break;
+                                }
+                            }
+                            case "QUIT" -> {
+                                work = false;
+                                break;
+                            }
+                        }
+                }
                 }
                   case "QUIT" -> {
                       indo = false;
@@ -408,6 +506,10 @@ public void takepic() throws IOException
             }
         }
     }
+    Process p = null;
+    Process p1 = null;
+    ObjectOutputStream out = null;
+    BufferedReader input = null;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Server;
     // End of variables declaration//GEN-END:variables
