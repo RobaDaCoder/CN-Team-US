@@ -127,12 +127,11 @@ public class process extends javax.swing.JFrame {
             program.os.write(s);
             program.os.newLine();
             program.os.flush();
-//            program.is = new BufferedReader(new InputStreamReader(program.sclient.getInputStream()));
             String soprocess = program.is.readLine();
             int soprocess1 = 0;
             soprocess1 = Integer.parseInt(soprocess);
             ObjectInputStream oin = new ObjectInputStream(program.sclient.getInputStream());
-            for (int i = 0; i < soprocess1; i++)
+            for (int i = 0; i < soprocess1-3; i++)
             {
                 String[] data = (String[]) oin.readObject();
                 DefaultTableModel table = (DefaultTableModel)jTable1.getModel();

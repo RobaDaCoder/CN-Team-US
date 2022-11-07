@@ -34,6 +34,7 @@ public class program {
     public static BufferedReader is;
     public static BufferedWriter os;
     public static String signal;
+    public static int soprocess;
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -51,8 +52,13 @@ public class program {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(server.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        server server = new server();
-        server.setVisible(true);
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new server().setVisible(true);
+                
+            }
+        });
 //            try {
 //            String line;
 //            Process p = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");

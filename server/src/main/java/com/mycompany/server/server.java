@@ -4,6 +4,7 @@
  */
 package com.mycompany.server;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -19,7 +20,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.Socket;
 import java.util.Iterator;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -96,7 +101,8 @@ public class server extends javax.swing.JFrame {
            program.sserver = listener.accept();
            program.is = new BufferedReader(new InputStreamReader(program.sserver.getInputStream()));
            program.os = new BufferedWriter(new OutputStreamWriter(program.sserver.getOutputStream()));
-           while (true)
+           boolean perform = true;
+           while (perform)
            {
                receiveSignal();
                switch (program.signal)
@@ -153,6 +159,8 @@ public class server extends javax.swing.JFrame {
 //            }
 //        });
 //    }
+    
+    
     public void keylog()
     {
         String s = null;
@@ -162,17 +170,68 @@ public class server extends javax.swing.JFrame {
     {
         try{
             Runtime runtime = Runtime.getRuntime();
-            Process proc = runtime.exec("shutdown -s -t 0");
+            Process proc = runtime.exec("shutdown -s -t 5");
             System.exit(0);
-        } catch (Exception ex)
+        } catch (IOException ex)
         {
             JOptionPane.showMessageDialog(null,ex);
         }
     }
     
-    public void application()
+    public void application() throws IOException
     {
-        String ss = null;
+        boolean indo = true;
+        while (indo)
+        {
+            receiveSignal();
+            switch(program.signal)
+            {
+                case "XEM" ->                 {
+                    try {
+                        String line = null;
+                        Process p = Runtime.getRuntime().exec("powershell.exe Get-Process | Where-Object { $_.MainWindowTitle } | Format-Table ID,Name,Mainwindowtitle –AutoSize");
+                        BufferedReader input = new BufferedReader(new InputStreamReader(p.getInputStream()));                  
+                        int soprocess = 0;
+                        while(input.readLine() != null){
+                            soprocess++;
+                        }
+                        String soprocess1 = Integer.toString(soprocess);
+                        program.os = new BufferedWriter(new OutputStreamWriter(program.sserver.getOutputStream()));
+                        program.os.write(soprocess1);
+                        program.os.newLine();
+                        program.os.flush();
+                        Process p1 = Runtime.getRuntime().exec("powershell.exe Get-Process | Where-Object { $_.MainWindowTitle } | Format-Table ID,Name,Mainwindowtitle –AutoSize");
+                        BufferedReader input1 = new BufferedReader(new InputStreamReader(p1.getInputStream())); 
+                        try (ObjectOutputStream out = new ObjectOutputStream(program.sserver.getOutputStream())) {
+                            for(int i = 0; (i<soprocess) ;i++) {
+                                line = input1.readLine();
+                                line = line.trim();
+                                if (i>=3) 
+                                {
+                                    if (i == soprocess-1)
+                                    {
+                                        break;
+                                    }
+                                    line = line.replaceAll("\\s{1,100}", " ");
+                                    String[] splitline = line.split(" ",3);
+                                    String data[] = {splitline[0],splitline[1],splitline[2]};
+                                    out.writeObject(data);
+                                    out.flush();
+                                }
+                            }
+                        }
+                    }
+                    catch(IOException e)
+                    {
+                      JOptionPane.showMessageDialog(null,e);
+                    }
+                }
+                  case "QUIT" -> {
+                      indo = false;
+                      return;
+                }
+            }
+        }
     }
     
     public void registry()
@@ -182,7 +241,8 @@ public class server extends javax.swing.JFrame {
     
     public void process()
     {
-        while (true)
+        boolean indo = true;
+        while (indo)
         {
             receiveSignal();
             switch(program.signal)
@@ -203,61 +263,61 @@ public class server extends javax.swing.JFrame {
                         program.os.flush();
                         Process p1 = Runtime.getRuntime().exec(System.getenv("windir") +"\\system32\\"+"tasklist.exe");
                         BufferedReader input1 = new BufferedReader(new InputStreamReader(p1.getInputStream())); 
-                        ObjectOutputStream out = new ObjectOutputStream(program.sserver.getOutputStream());
-                        for(int i = 0; (i<soprocess) ;i++) {
-                            line = input1.readLine();
-                            if (i>4)
-                            {
-                                for (int u =0; u < line.length()-2;u++)
+                        try (ObjectOutputStream out = new ObjectOutputStream(program.sserver.getOutputStream())) {
+                            for(int i = 0; (i<soprocess) ;i++) {
+                                line = input1.readLine();
+                                if (i>=3)
                                 {
-                                    if ((line.charAt(u)>64 && line.charAt(u)<=122)&&(line.charAt(u+2)>64 && line.charAt(u+2)<=122) && line.charAt(u+1)==' ')
+                                    for (int u =0; u < line.length()-2;u++)
                                     {
-                                        line = line.substring(0,u+1)+"_"+line.substring(u+2,line.length());
+                                        if ((line.charAt(u)>64 && line.charAt(u)<=122)&&(line.charAt(u+2)>64 && line.charAt(u+2)<=122) && line.charAt(u+1)==' ')
+                                        {
+                                            line = line.substring(0,u+1)+"_"+line.substring(u+2,line.length());
+                                        }
                                     }
+                                    String[] splitline = line.trim().split("\\s{1,100}");
+                                    String data[] = {splitline[0],splitline[1],splitline[2],splitline[3],splitline[4]+splitline[5]};
+                                    out.writeObject(data);
+                                    out.flush();
                                 }
-                                String[] splitline = line.trim().split("\\s{1,100}");
-                                String data[] = {splitline[0],splitline[1],splitline[2],splitline[3],splitline[4]+splitline[5]};
-                                out.writeObject(data);
                             }
                         }
-                        out.flush();
-                        out.close();
                     }
-                    catch(Exception e)
+                    catch(IOException e)
                     {
                       JOptionPane.showMessageDialog(null,e);
-                    } finally {
                     }
                 }
                   case "QUIT" -> {
-                                        return;
+                      indo = false;
+                      return;
                 }
             }
         }
     }
 public void takepic()
     {
-        while (true)
+        boolean indo = true;
+        while (indo)
         {
             receiveSignal();
             switch(program.signal)
             {
                 case "TAKE" ->                 {
                     try{
-
-                        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-                        Robot robot = new Robot();
+                        robot = new Robot();
                         ByteArrayOutputStream ous = new ByteArrayOutputStream();
-                        BufferedImage img = robot.createScreenCapture(new Rectangle(0,0,(int) d.getWidth(), (int) d.getHeight()));                            
-                        ImageIO.write(img, "png", ous);
+                        bimg = robot.createScreenCapture(new Rectangle(0,0,(int) d.getWidth(), (int) d.getHeight()));
+                        ImageIO.write(bimg, "png", program.sserver.getOutputStream());
                         program.sserver.getOutputStream().write(ous.toByteArray());
-                        ous.reset();
-                        ous.close();
+                        ous.flush();
+                        break;
                     } catch(Exception ex){
                             JOptionPane.showMessageDialog(null,ex);
                     }
                 }
                 case "QUIT" ->                 {
+                    indo = false;
                     return;
                 }
             }
@@ -266,8 +326,8 @@ public void takepic()
     
     public void checkscreen()
     {
-        String ss = null;
-        while (true)
+        boolean indo = true;
+        while (indo)
         {
             receiveSignal();
             switch(program.signal)
@@ -296,15 +356,20 @@ public void takepic()
                     }
                 }
                 case "QUIT" ->                 {
+                    indo = false;
                     return;
                 }
             }
         }
     }
+    private Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
+    private Image newimg;
+    private Robot robot;
+    private static BufferedImage bimg;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton Server;
     // End of variables declaration//GEN-END:variables
-
+//    private ByteArrayOutputStream ous = new ByteArrayOutputStream();
     void setvisible(boolean b) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }

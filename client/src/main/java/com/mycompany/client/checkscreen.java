@@ -16,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -23,6 +24,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingWorker;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -109,37 +111,47 @@ public class checkscreen extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    
     private void startActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startActionPerformed
-        start();
+            (t = new aTask()).execute();
+            cam.setIcon(null);
+            start.setEnabled(false);
+            stop.setEnabled(true);
     }//GEN-LAST:event_startActionPerformed
 
-    public void start()
-    {
-        try {
-            String s = "START";
-//            program.os = new BufferedWriter(new OutputStreamWriter(program.sclient.getOutputStream()));
-            program.os.write(s);
-            program.os.newLine();
-            program.os.flush();
-            while(true){
-                BufferedImage img = ImageIO.read(program.sclient.getInputStream());
-                cam.getGraphics().drawImage(img,0,0,cam.getWidth(),cam.getHeight(),null);
-                cam.removeAll();
-                try {
-                    Thread.sleep(30);
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null,e);
-                }
-            }
-        } catch (IOException ex) {
-            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+//    public void start()
+//    {
+//        try {
+//            String s = "START";
+////            program.os = new BufferedWriter(new OutputStreamWriter(program.sclient.getOutputStream()));
+//            program.os.write(s);
+//            program.os.newLine();
+//            program.os.flush();
+//            while(true){
+//                BufferedImage img = ImageIO.read(program.sclient.getInputStream());
+//                cam.getGraphics().drawImage(img,0,0,cam.getWidth(),cam.getHeight(),null);
+//                cam.removeAll();
+//                try {
+//                    Thread.sleep(30);
+//                } catch (Exception e) {
+//                    JOptionPane.showMessageDialog(null,e);
+//                }
+//            }
+//        } catch (IOException ex) {
+//            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//    }
     private void stopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopActionPerformed
-
+           t.cancel(true);
+           t = null;
+           cam.removeAll();
+           start.setEnabled(true);
+           stop.setEnabled(false);
     }//GEN-LAST:event_stopActionPerformed
 
+    
+    
+    
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         try {
             String s = "QUIT";
@@ -155,7 +167,7 @@ public class checkscreen extends javax.swing.JFrame {
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
 
     }//GEN-LAST:event_formWindowClosed
-
+  
     /**
      * @param args the command line arguments
      */
@@ -196,4 +208,40 @@ public class checkscreen extends javax.swing.JFrame {
     private javax.swing.JButton start;
     private javax.swing.JButton stop;
     // End of variables declaration//GEN-END:variables
+    private aTask t;
+    
+    private class aTask extends SwingWorker<Void, Integer> {
+            @Override
+            protected Void doInBackground() throws Exception {
+                try {
+            String s = "START";
+//            program.os = new BufferedWriter(new OutputStreamWriter(program.sclient.getOutputStream()));
+            program.os.write(s);
+            program.os.newLine();
+            program.os.flush();
+            while(!isCancelled()){
+                BufferedImage img = ImageIO.read(program.sclient.getInputStream());
+                cam.getGraphics().drawImage(img,0,0,cam.getWidth(),cam.getHeight(),null);
+                cam.removeAll();
+                try {
+                    Thread.sleep(40);
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null,e);
+                }
+            }
+            } catch (IOException ex) {
+                Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            return null;
+            }
+            @Override
+            protected void done()
+            {
+                
+            }
+            @Override
+            protected void process(List<Integer> chunk) {
+                Integer counterChunk = chunk.get(chunk.size()-1);
+            }
+        }
 }

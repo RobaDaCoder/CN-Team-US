@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 /**
  *
  * @author LEGION
@@ -192,20 +193,20 @@ public class client extends javax.swing.JFrame {
     private void ipconnectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ipconnectActionPerformed
         String s;  
         boolean test = true;
-        final String ip = iptext.getText(); //Tạo biến ip (kiểu string) lấy từ khung iptext.
+        program.ip = iptext.getText(); //Tạo biến ip (kiểu string) lấy từ khung iptext.
         try{          
-            SocketAddress socketaddr = new InetSocketAddress(ip,6920); //tạo socket address với biến socketaddr cùng vời địa chỉ ip và port
+            SocketAddress socketaddr = new InetSocketAddress(program.ip,6920); //tạo socket address với biến socketaddr cùng vời địa chỉ ip và port
             program.sclient = new Socket();
             program.sclient.connect(socketaddr); //connect với server
-            JOptionPane.showMessageDialog(rootPane, "Kết nối thành công"); // tạo messagebox kết nói thành công
         } catch(Exception ex){
-            JOptionPane.showMessageDialog(rootPane, "Kết nối thất bại tới " + ip);
+            JOptionPane.showMessageDialog(rootPane, "Kết nối thất bại tới " + program.ip);
             test = false;
             program.sclient = null;
         }
         if (test)
         {
             try {
+                JOptionPane.showMessageDialog(rootPane, "Kết nối thành công");
                 program.is = new BufferedReader(new InputStreamReader(program.sclient.getInputStream()));
                 program.os = new BufferedWriter(new OutputStreamWriter(program.sclient.getOutputStream()));
             } catch (IOException ex) {
@@ -262,13 +263,11 @@ public class client extends javax.swing.JFrame {
 //            program.os = new BufferedWriter(new OutputStreamWriter(program.sclient.getOutputStream()));
             program.os.write(s);
             program.os.newLine();
-            program.os.flush();    
+            program.os.flush();
+            new pic().setVisible(true);
         } catch (IOException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }
-        pic pic = new pic();
-        
-        pic.show();
     }//GEN-LAST:event_ScreenshotActionPerformed
 
     private void AppRunningActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AppRunningActionPerformed
@@ -277,8 +276,6 @@ public class client extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(rootPane, "Chưa kết nối tới server");
             return;
         }
-        listApp listApp = new listApp();
-        listApp.show();
         String s = "APPLICATION";
         try {
 //            program.os = new BufferedWriter(new OutputStreamWriter(program.sclient.getOutputStream()));
@@ -288,6 +285,8 @@ public class client extends javax.swing.JFrame {
         } catch (IOException ex) {
             Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
         }
+        listApp listApp = new listApp();
+        listApp.show();
     }//GEN-LAST:event_AppRunningActionPerformed
 
     private void ShutDownActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShutDownActionPerformed
